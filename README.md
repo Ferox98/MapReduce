@@ -3,9 +3,11 @@ Code for distributed MapReduce coding challenge by benshi.ai
 
 Requirements:
 The code uses Flask's REST API and requests module
+
 pip install -r requirements.txt
 
 Usage:
+
 First run driver and specify N and M values as command line arguments.
 
 python driver.py -N 6 -M 4
@@ -15,6 +17,7 @@ Then run workers on separate terminal.
 python worker.py
 
 Description:
+
 The Driver module exposes an API that assigns a task to a worker. 
 It first assigns map tasks to the workers to process the input files.
 Once the map tasks are finished, the workers are then assigned reduce tasks.
