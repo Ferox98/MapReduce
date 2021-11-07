@@ -1,14 +1,18 @@
 import requests
 import os 
+import time 
 
 BASE = "http://127.0.0.1:5000"
 
 class Worker:
 
     def __init__(self):
+        self.files = []
+    
+    def getFiles(self):
         path = os.getcwd() + '\\intermediate'
         self.files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    
+
     def work(self):
         while True:
             try:
@@ -21,11 +25,11 @@ class Worker:
                     break
                 elif params[0] == 'MAP': # map task
                     filename = params[2]
-                    bucket_count = params[3]
+                    bucket_count = int(params[3])
                     print('Mapping {}'.format(filename))
                     task_id = params[1]
                     buckets = [] 
-                    for i in range(int(bucket_count)):
+                    for i in range(bucket_count):
                         buckets.append([])
                     file = open('inputs/' + filename, 'r')
                     lines = file.readlines()
@@ -40,7 +44,7 @@ class Worker:
                                 continue
                             cur_word = word.lower()
                             # bucket is assigned on ASCII value of first character modulo the number of buckets (reduce tasks)
-                            bucket = ord(cur_word[0]) % int(bucket_count)
+                            bucket = ord(cur_word[0]) % bucket_count
                             buckets[bucket].append(word)
                     # write buckets to file
                     for i in range(len(buckets)):
@@ -50,6 +54,8 @@ class Worker:
                                 if len(word) > 0:
                                     f.write(word + "\n")
                 else: # reduce task
+                    if len(self.files) == 0:
+                        self.getFiles()
                     reduce_task_id = params[1]
                     print('Reducing bucket {}'.format(reduce_task_id)) 
                     word_count = {}
